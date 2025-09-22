@@ -35,14 +35,14 @@ const services = [
     features: ["Leak repairs", "Pipe installation", "24/7 emergency"]
   },
   {
-    id: "electrical",
+    id: "painting",
     icon: Zap,
-    title: "Electrical Work",
-    description: "Safe and certified electrical services",
-    price: "₹249",
-    duration: "1-3 hours",
+    title: "Painting Services",
+    description: "Professional home and room painting",
+    price: "₹399",
+    duration: "4-6 hours",
     popular: false,
-    features: ["Wiring", "Appliance repair", "Safety check"]
+    features: ["Interior painting", "Exterior painting", "Color consultation"]
   },
   {
     id: "food",

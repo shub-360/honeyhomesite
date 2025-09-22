@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BookingDialog } from "./BookingDialog";
 import { 
   Sparkles, 
   Wrench, 
@@ -88,6 +90,14 @@ const services = [
 ];
 
 export const ServicesSection = () => {
+  const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+
+  const handleBookNow = (service: typeof services[0]) => {
+    setSelectedService(service);
+    setIsBookingOpen(true);
+  };
+
   return (
     <section id="services" className="py-20 bg-background">
       <div className="container">
@@ -156,6 +166,7 @@ export const ServicesSection = () => {
                   <Button 
                     className="w-full group-hover:shadow-soft transition-all" 
                     variant="outline"
+                    onClick={() => handleBookNow(service)}
                   >
                     Book Now
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -173,6 +184,12 @@ export const ServicesSection = () => {
           </Button>
         </div>
       </div>
+
+      <BookingDialog
+        open={isBookingOpen}
+        onOpenChange={setIsBookingOpen}
+        service={selectedService}
+      />
     </section>
   );
 };

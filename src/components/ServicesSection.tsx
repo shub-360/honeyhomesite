@@ -10,7 +10,8 @@ import {
   Car,
   ArrowRight,
   Clock,
-  IndianRupee
+  IndianRupee,
+  Users
 } from "lucide-react";
 
 const services = [
@@ -55,14 +56,24 @@ const services = [
     features: ["Fresh ingredients", "Custom diet", "Same day delivery"]
   },
   {
-    id: "massage",
-    icon: Flower2,
-    title: "Massage & Spa",
-    description: "Relaxing spa treatments at your home",
+    id: "mens-massage",
+    icon: Users,
+    title: "Men's Massage & Spa",
+    description: "Relaxing spa treatments for men at your home",
     price: "₹599",
     duration: "60-90 mins",
     popular: false,
-    features: ["Certified therapists", "Premium oils", "Multiple therapies"]
+    features: ["Male therapists", "Sports massage", "Stress relief therapy"]
+  },
+  {
+    id: "womens-massage",
+    icon: Flower2,
+    title: "Women's Massage & Spa",
+    description: "Premium spa treatments for women at your home",
+    price: "₹649",
+    duration: "60-90 mins",
+    popular: true,
+    features: ["Female therapists", "Beauty treatments", "Aromatherapy"]
   },
   {
     id: "car",

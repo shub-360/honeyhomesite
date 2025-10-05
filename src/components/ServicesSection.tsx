@@ -91,8 +91,10 @@ const services = [
 
 export const ServicesSection = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [selectedServiceCategory, setSelectedServiceCategory] = useState<string | null>(null);
 
-  const handleBookNow = () => {
+  const handleBookNow = (serviceId: string) => {
+    setSelectedServiceCategory(serviceId);
     setIsBookingOpen(true);
   };
 
@@ -164,7 +166,7 @@ export const ServicesSection = () => {
                   <Button 
                     className="w-full group-hover:shadow-soft transition-all" 
                     variant="outline"
-                    onClick={handleBookNow}
+                    onClick={() => handleBookNow(service.id)}
                   >
                     Book Now
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -186,6 +188,7 @@ export const ServicesSection = () => {
       <BookingDialog
         open={isBookingOpen}
         onOpenChange={setIsBookingOpen}
+        serviceCategory={selectedServiceCategory}
       />
     </section>
   );

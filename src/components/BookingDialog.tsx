@@ -43,84 +43,310 @@ interface Service {
 interface BookingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  service?: Service | null;
+  serviceCategory?: string | null;
 }
 
-const services: Service[] = [
-  {
-    id: "cleaning",
-    icon: Sparkles,
-    title: "Home & Kitchen Cleaning",
-    description: "Professional deep cleaning for your home and kitchen",
-    price: "₹299",
-    duration: "2-3 hours",
-    popular: true,
-    features: ["Deep cleaning", "Sanitization", "Eco-friendly products"]
-  },
-  {
-    id: "plumbing",
-    icon: Wrench,
-    title: "Plumbing Services", 
-    description: "Expert plumbing repairs and installations",
-    price: "₹199",
-    duration: "1-2 hours",
-    popular: false,
-    features: ["Leak repairs", "Pipe installation", "24/7 emergency"]
-  },
-  {
-    id: "painting",
-    icon: Zap,
-    title: "Painting Services",
-    description: "Professional home and room painting", 
-    price: "₹399",
-    duration: "4-6 hours",
-    popular: false,
-    features: ["Interior painting", "Exterior painting", "Color consultation"]
-  },
-  {
-    id: "food",
-    icon: ChefHat,
-    title: "Home-Cooked Food",
-    description: "Fresh, healthy meals delivered to your door",
-    price: "₹149", 
-    duration: "45 mins",
-    popular: true,
-    features: ["Fresh ingredients", "Custom diet", "Same day delivery"]
-  },
-  {
-    id: "mens-massage",
-    icon: Users,
-    title: "Men's Massage & Spa",
-    description: "Relaxing spa treatments for men at your home",
-    price: "₹599",
-    duration: "60-90 mins", 
-    popular: false,
-    features: ["Male therapists", "Sports massage", "Stress relief therapy"]
-  },
-  {
-    id: "womens-massage", 
-    icon: Flower2,
-    title: "Women's Massage & Spa",
-    description: "Premium spa treatments for women at your home",
-    price: "₹649",
-    duration: "60-90 mins",
-    popular: true,
-    features: ["Female therapists", "Beauty treatments", "Aromatherapy"]
-  },
-  {
-    id: "car",
-    icon: Car,
-    title: "Car Wash & Care",
-    description: "Professional car cleaning and maintenance",
-    price: "₹199",
-    duration: "45-60 mins",
-    popular: false,
-    features: ["Wash & vacuum", "Interior cleaning", "At your location"]
-  }
-];
+const servicesByCategory: Record<string, Service[]> = {
+  "cleaning": [
+    {
+      id: "utensil-cleaning",
+      icon: Sparkles,
+      title: "Utensil Cleaning",
+      description: "Deep cleaning of all kitchen utensils and dishes",
+      price: "₹199",
+      duration: "1-2 hours",
+      popular: false,
+      features: ["All utensils", "Sanitization", "Eco-friendly products"]
+    },
+    {
+      id: "full-furnished-cleaning",
+      icon: Sparkles,
+      title: "Full Furnished Cleaning",
+      description: "Complete cleaning of fully furnished home",
+      price: "₹499",
+      duration: "3-4 hours",
+      popular: true,
+      features: ["All rooms", "Furniture dusting", "Floor mopping"]
+    },
+    {
+      id: "unfurnished-cleaning",
+      icon: Sparkles,
+      title: "Unfurnished Cleaning",
+      description: "Deep cleaning of unfurnished spaces",
+      price: "₹299",
+      duration: "2-3 hours",
+      popular: false,
+      features: ["Floor cleaning", "Wall wiping", "Window cleaning"]
+    },
+    {
+      id: "full-kitchen-cleaning",
+      icon: Sparkles,
+      title: "Full Kitchen Cleaning",
+      description: "Complete kitchen deep cleaning service",
+      price: "₹399",
+      duration: "2-3 hours",
+      popular: true,
+      features: ["Chimney cleaning", "Appliances", "Platform & sink"]
+    }
+  ],
+  "plumbing": [
+    {
+      id: "bathroom-pipes-change",
+      icon: Wrench,
+      title: "Bathroom Pipes Change",
+      description: "Complete bathroom pipe replacement",
+      price: "₹599",
+      duration: "2-3 hours",
+      popular: true,
+      features: ["Pipe replacement", "Leak testing", "Quality materials"]
+    },
+    {
+      id: "valves-pipes-cleaning",
+      icon: Wrench,
+      title: "Valves & Pipes Cleaning",
+      description: "Professional valve and pipe cleaning",
+      price: "₹299",
+      duration: "1-2 hours",
+      popular: false,
+      features: ["Valve cleaning", "Pipe descaling", "Leak check"]
+    },
+    {
+      id: "tap-installation",
+      icon: Wrench,
+      title: "Tap Installation & Repair",
+      description: "New tap installation and repairs",
+      price: "₹199",
+      duration: "1 hour",
+      popular: false,
+      features: ["All types of taps", "Leak repair", "Warranty included"]
+    },
+    {
+      id: "drain-cleaning",
+      icon: Wrench,
+      title: "Drain Cleaning",
+      description: "Blocked drain and sewage cleaning",
+      price: "₹399",
+      duration: "1-2 hours",
+      popular: true,
+      features: ["Drain unclogging", "Sewage cleaning", "24/7 available"]
+    }
+  ],
+  "painting": [
+    {
+      id: "interior-painting",
+      icon: Zap,
+      title: "Interior Painting",
+      description: "Professional interior wall painting",
+      price: "₹399",
+      duration: "4-6 hours",
+      popular: true,
+      features: ["Room painting", "Color options", "Premium finish"]
+    },
+    {
+      id: "exterior-painting",
+      icon: Zap,
+      title: "Exterior Painting",
+      description: "Durable exterior wall painting",
+      price: "₹599",
+      duration: "6-8 hours",
+      popular: false,
+      features: ["Weatherproof paint", "Surface prep", "Long lasting"]
+    },
+    {
+      id: "texture-painting",
+      icon: Zap,
+      title: "Texture Painting",
+      description: "Designer texture wall painting",
+      price: "₹799",
+      duration: "6-8 hours",
+      popular: true,
+      features: ["Multiple designs", "Premium texture", "Expert application"]
+    },
+    {
+      id: "furniture-painting",
+      icon: Zap,
+      title: "Furniture Painting",
+      description: "Furniture repainting and refinishing",
+      price: "₹299",
+      duration: "2-3 hours",
+      popular: false,
+      features: ["All furniture types", "Color matching", "Smooth finish"]
+    }
+  ],
+  "food": [
+    {
+      id: "daily-meals",
+      icon: ChefHat,
+      title: "Daily Meals Package",
+      description: "Fresh home-cooked meals every day",
+      price: "₹149",
+      duration: "45 mins",
+      popular: true,
+      features: ["Lunch & dinner", "Fresh ingredients", "Custom menu"]
+    },
+    {
+      id: "party-catering",
+      icon: ChefHat,
+      title: "Party Catering",
+      description: "Catering services for parties and events",
+      price: "₹999",
+      duration: "2-3 hours",
+      popular: true,
+      features: ["Multiple dishes", "Serves 10-15", "Setup included"]
+    },
+    {
+      id: "diet-meals",
+      icon: ChefHat,
+      title: "Diet & Healthy Meals",
+      description: "Customized diet-friendly meals",
+      price: "₹199",
+      duration: "45 mins",
+      popular: false,
+      features: ["Low calorie", "High protein", "Nutritionist approved"]
+    },
+    {
+      id: "traditional-meals",
+      icon: ChefHat,
+      title: "Traditional Indian Meals",
+      description: "Authentic traditional Indian cuisine",
+      price: "₹179",
+      duration: "45 mins",
+      popular: false,
+      features: ["Regional cuisine", "Traditional recipes", "Home style"]
+    }
+  ],
+  "mens-massage": [
+    {
+      id: "sports-massage",
+      icon: Users,
+      title: "Sports Massage",
+      description: "Deep tissue massage for athletes",
+      price: "₹699",
+      duration: "60 mins",
+      popular: true,
+      features: ["Male therapist", "Deep tissue", "Muscle recovery"]
+    },
+    {
+      id: "stress-relief",
+      icon: Users,
+      title: "Stress Relief Therapy",
+      description: "Relaxation massage for stress relief",
+      price: "₹599",
+      duration: "60 mins",
+      popular: true,
+      features: ["Male therapist", "Full body", "Aromatherapy"]
+    },
+    {
+      id: "back-shoulder-massage",
+      icon: Users,
+      title: "Back & Shoulder Massage",
+      description: "Targeted massage for back and shoulders",
+      price: "₹499",
+      duration: "45 mins",
+      popular: false,
+      features: ["Male therapist", "Pain relief", "Pressure point therapy"]
+    },
+    {
+      id: "head-massage",
+      icon: Users,
+      title: "Head & Neck Massage",
+      description: "Relaxing head and neck massage",
+      price: "₹399",
+      duration: "30 mins",
+      popular: false,
+      features: ["Male therapist", "Hair oil included", "Stress relief"]
+    }
+  ],
+  "womens-massage": [
+    {
+      id: "spa-package",
+      icon: Flower2,
+      title: "Premium Spa Package",
+      description: "Complete spa experience at home",
+      price: "₹899",
+      duration: "90 mins",
+      popular: true,
+      features: ["Female therapist", "Full body massage", "Facial included"]
+    },
+    {
+      id: "aromatherapy",
+      icon: Flower2,
+      title: "Aromatherapy Massage",
+      description: "Relaxing aromatherapy session",
+      price: "₹649",
+      duration: "60 mins",
+      popular: true,
+      features: ["Female therapist", "Essential oils", "Full relaxation"]
+    },
+    {
+      id: "prenatal-massage",
+      icon: Flower2,
+      title: "Prenatal Massage",
+      description: "Safe massage for expecting mothers",
+      price: "₹799",
+      duration: "60 mins",
+      popular: false,
+      features: ["Female therapist", "Pregnancy safe", "Gentle techniques"]
+    },
+    {
+      id: "beauty-treatments",
+      icon: Flower2,
+      title: "Beauty Treatments",
+      description: "Facial and beauty services",
+      price: "₹599",
+      duration: "60 mins",
+      popular: true,
+      features: ["Female therapist", "Facial & cleanup", "Beauty products"]
+    }
+  ],
+  "car": [
+    {
+      id: "basic-car-wash",
+      icon: Car,
+      title: "Basic Car Wash",
+      description: "Exterior wash and vacuum",
+      price: "₹199",
+      duration: "30 mins",
+      popular: true,
+      features: ["Exterior wash", "Vacuum cleaning", "At your location"]
+    },
+    {
+      id: "deep-car-cleaning",
+      icon: Car,
+      title: "Deep Car Cleaning",
+      description: "Complete interior and exterior cleaning",
+      price: "₹499",
+      duration: "60 mins",
+      popular: true,
+      features: ["Full interior", "Exterior polish", "Dashboard cleaning"]
+    },
+    {
+      id: "car-polish",
+      icon: Car,
+      title: "Car Polish & Wax",
+      description: "Professional car polishing service",
+      price: "₹799",
+      duration: "90 mins",
+      popular: false,
+      features: ["Body polish", "Wax coating", "Scratch removal"]
+    },
+    {
+      id: "engine-cleaning",
+      icon: Car,
+      title: "Engine Cleaning",
+      description: "Professional engine bay cleaning",
+      price: "₹399",
+      duration: "45 mins",
+      popular: false,
+      features: ["Engine degreasing", "Bay cleaning", "Safe for engine"]
+    }
+  ]
+};
 
-export const BookingDialog = ({ open, onOpenChange, service: initialService }: BookingDialogProps) => {
-  const [selectedService, setSelectedService] = useState<Service | null>(initialService || null);
+export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDialogProps) => {
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  
+  const availableServices = serviceCategory ? servicesByCategory[serviceCategory] || [] : [];
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -168,7 +394,7 @@ export const BookingDialog = ({ open, onOpenChange, service: initialService }: B
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
-              {services.map((service) => {
+              {availableServices.map((service) => {
                 const IconComponent = service.icon;
                 return (
                   <Card 

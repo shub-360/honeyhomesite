@@ -6,36 +6,37 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, User, Shield, Star } from "lucide-react";
+import "./Header.css";
 
 export const Header = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-primary">
-            <Home className="h-6 w-6 text-primary-foreground" />
+    <header className="header">
+      <div className="header-container">
+        <div className="header-logo">
+          <div className="header-logo-icon">
+            <Home />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Honey Homes</h1>
-            <p className="text-xs text-muted-foreground">Trusted Home Services</p>
+            <h1 className="header-title">Honey Homes</h1>
+            <p className="header-subtitle">Trusted Home Services</p>
           </div>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-6">
-          <a href="#services" className="text-sm font-medium text-foreground hover:text-primary transition-smooth">
+        <nav className="header-nav">
+          <a href="#services" className="header-nav-link">
             Services
           </a>
-          <a href="#about" className="text-sm font-medium text-foreground hover:text-primary transition-smooth">
+          <a href="#about" className="header-nav-link">
             How it Works
           </a>
-          <a href="#contact" className="text-sm font-medium text-foreground hover:text-primary transition-smooth">
+          <a href="#contact" className="header-nav-link">
             Contact
           </a>
         </nav>
 
-        <div className="flex items-center space-x-4">
+        <div className="header-actions">
           <Dialog open={isAuthOpen} onOpenChange={setIsAuthOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
@@ -45,9 +46,9 @@ export const Header = () => {
             </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle className="text-center">Welcome to Honey Homes</DialogTitle>
+                <DialogTitle className="auth-dialog-title">Welcome to Honey Homes</DialogTitle>
               </DialogHeader>
-              <Tabs defaultValue="login" className="w-full">
+              <Tabs defaultValue="login" className="auth-tabs">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">Login</TabsTrigger>
                   <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -61,12 +62,12 @@ export const Header = () => {
                         Enter your credentials to access your bookings
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
+                    <CardContent className="auth-card-content">
+                      <div className="auth-form-field">
                         <Label htmlFor="email">Email</Label>
                         <Input id="email" type="email" placeholder="your@email.com" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="auth-form-field">
                         <Label htmlFor="password">Password</Label>
                         <Input id="password" type="password" />
                       </div>
@@ -85,20 +86,20 @@ export const Header = () => {
                         Join thousands of satisfied customers
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
+                    <CardContent className="auth-card-content">
+                      <div className="auth-form-field">
                         <Label htmlFor="name">Full Name</Label>
                         <Input id="name" placeholder="John Doe" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="auth-form-field">
                         <Label htmlFor="signup-email">Email</Label>
                         <Input id="signup-email" type="email" placeholder="your@email.com" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="auth-form-field">
                         <Label htmlFor="phone">Phone Number</Label>
                         <Input id="phone" type="tel" placeholder="+91 98765 43210" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="auth-form-field">
                         <Label htmlFor="signup-password">Password</Label>
                         <Input id="signup-password" type="password" />
                       </div>

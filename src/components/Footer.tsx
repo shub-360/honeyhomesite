@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 
 export const Footer = () => {
   return (
-    <footer className="bg-card border-t">
+    <footer id="contact" className="bg-card border-t">
       <div className="container py-16">
         <div className="grid gap-8 lg:grid-cols-4">
           {/* Brand */}

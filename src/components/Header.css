@@ -83,22 +83,68 @@
   gap: 1rem;
 }
 
-.auth-dialog-title {
-  text-align: center;
+.header-loading {
+  width: 24px;
+  height: 24px;
+  border: 2px solid hsl(var(--border));
+  border-top-color: hsl(var(--primary));
+  border-radius: 50%;
+  animation: header-spin 1s linear infinite;
 }
 
-.auth-tabs {
-  width: 100%;
+@keyframes header-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.auth-card-content {
+.header-user-btn {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.auth-form-field {
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
+}
+
+.header-user-email {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .header-user-email {
+    display: none;
+  }
+}
+
+.header-dropdown {
+  min-width: 200px;
+}
+
+.header-dropdown-info {
+  padding: 0.75rem;
+}
+
+.header-dropdown-email {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  margin: 0 0 0.25rem;
+}
+
+.header-dropdown-role {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--muted));
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.header-dropdown-logout {
+  color: hsl(var(--destructive));
+  cursor: pointer;
+}
+
+.header-dropdown-logout:hover {
+  background: hsl(var(--destructive) / 0.1);
 }

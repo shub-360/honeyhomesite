@@ -1,19 +1,19 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Home, User, LogOut, Shield, Wrench } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { AuthModal } from "./AuthModal";
 import "./Header.css";
 
 export const Header = () => {
-  const navigate = useNavigate();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, role, signOut, loading } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
     toast.success("Logged out successfully");
-    navigate("/");
   };
 
   const getRoleIcon = () => {
@@ -87,7 +87,7 @@ export const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
+            <Button variant="outline" size="sm" onClick={() => setAuthModalOpen(true)}>
               <User className="h-4 w-4 mr-2" />
               Login
             </Button>
@@ -98,6 +98,8 @@ export const Header = () => {
           </Button>
         </div>
       </div>
+
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
     </header>
   );
 };

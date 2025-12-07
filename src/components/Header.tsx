@@ -1,15 +1,42 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, User, Shield, Star } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Home, User, LogOut, Shield, Wrench } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import "./Header.css";
 
 export const Header = () => {
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, role, signOut, loading } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Logged out successfully");
+    navigate("/");
+  };
+
+  const getRoleIcon = () => {
+    switch (role) {
+      case "admin":
+        return <Shield className="h-4 w-4" />;
+      case "technician":
+        return <Wrench className="h-4 w-4" />;
+      default:
+        return <User className="h-4 w-4" />;
+    }
+  };
+
+  const getRoleLabel = () => {
+    switch (role) {
+      case "admin":
+        return "Admin";
+      case "technician":
+        return "Technician";
+      default:
+        return "Customer";
+    }
+  };
 
   return (
     <header className="header">
@@ -37,81 +64,34 @@ export const Header = () => {
         </nav>
 
         <div className="header-actions">
-          <Dialog open={isAuthOpen} onOpenChange={setIsAuthOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <User className="h-4 w-4 mr-2" />
-                Login
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle className="auth-dialog-title">Welcome to Honey Homes</DialogTitle>
-              </DialogHeader>
-              <Tabs defaultValue="login" className="auth-tabs">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="login">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Login to your account</CardTitle>
-                      <CardDescription>
-                        Enter your credentials to access your bookings
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="auth-card-content">
-                      <div className="auth-form-field">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" placeholder="your@email.com" />
-                      </div>
-                      <div className="auth-form-field">
-                        <Label htmlFor="password">Password</Label>
-                        <Input id="password" type="password" />
-                      </div>
-                      <Button className="w-full" variant="default">
-                        Login
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="signup">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Create your account</CardTitle>
-                      <CardDescription>
-                        Join thousands of satisfied customers
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="auth-card-content">
-                      <div className="auth-form-field">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" placeholder="John Doe" />
-                      </div>
-                      <div className="auth-form-field">
-                        <Label htmlFor="signup-email">Email</Label>
-                        <Input id="signup-email" type="email" placeholder="your@email.com" />
-                      </div>
-                      <div className="auth-form-field">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" type="tel" placeholder="+91 98765 43210" />
-                      </div>
-                      <div className="auth-form-field">
-                        <Label htmlFor="signup-password">Password</Label>
-                        <Input id="signup-password" type="password" />
-                      </div>
-                      <Button className="w-full" variant="default">
-                        Create Account
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </DialogContent>
-          </Dialog>
+          {loading ? (
+            <div className="header-loading" />
+          ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="header-user-btn">
+                  {getRoleIcon()}
+                  <span className="header-user-email">{user.email?.split("@")[0]}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="header-dropdown">
+                <div className="header-dropdown-info">
+                  <p className="header-dropdown-email">{user.email}</p>
+                  <span className="header-dropdown-role">{getRoleLabel()}</span>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="header-dropdown-logout">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
+              <User className="h-4 w-4 mr-2" />
+              Login
+            </Button>
+          )}
           
           <Button variant="default" size="sm">
             Book Service

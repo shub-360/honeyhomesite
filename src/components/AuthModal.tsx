@@ -111,10 +111,10 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
         <DialogHeader>
           <div className="auth-modal-brand">
             <div className="auth-modal-logo">
-              <Home className="h-6 w-6" />
+              <Home className="h-7 w-7" />
             </div>
             <DialogTitle className="auth-modal-title">Honey Homes</DialogTitle>
-            <p className="auth-modal-subtitle">Trusted Home Services</p>
+            <p className="auth-modal-subtitle">Your trusted partner for home services</p>
           </div>
         </DialogHeader>
 
@@ -127,13 +127,13 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
           <TabsContent value="login">
             <form onSubmit={handleLogin} className="auth-modal-form">
               <div className="auth-modal-field">
-                <Label htmlFor="modal-login-email">Email</Label>
+                <Label htmlFor="modal-login-email">Email Address</Label>
                 <div className="auth-modal-input-wrapper">
                   <Mail className="auth-modal-input-icon" />
                   <Input 
                     id="modal-login-email" 
                     type="email" 
-                    placeholder="your@email.com"
+                    placeholder="Enter your email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     className="auth-modal-input"
@@ -148,6 +148,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                   <Input 
                     id="modal-login-password" 
                     type="password"
+                    placeholder="Enter your password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     className="auth-modal-input"
@@ -156,7 +157,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                 </div>
               </div>
               <Button type="submit" className="auth-modal-submit" disabled={isSubmitting}>
-                {isSubmitting ? "Logging in..." : "Login"}
+                {isSubmitting ? "Signing in..." : "Sign In"}
               </Button>
             </form>
           </TabsContent>
@@ -169,7 +170,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                   <User className="auth-modal-input-icon" />
                   <Input 
                     id="modal-signup-name" 
-                    placeholder="John Doe"
+                    placeholder="Enter your full name"
                     value={signupName}
                     onChange={(e) => setSignupName(e.target.value)}
                     className="auth-modal-input"
@@ -178,13 +179,13 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                 </div>
               </div>
               <div className="auth-modal-field">
-                <Label htmlFor="modal-signup-email">Email</Label>
+                <Label htmlFor="modal-signup-email">Email Address</Label>
                 <div className="auth-modal-input-wrapper">
                   <Mail className="auth-modal-input-icon" />
                   <Input 
                     id="modal-signup-email" 
                     type="email" 
-                    placeholder="your@email.com"
+                    placeholder="Enter your email"
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
                     className="auth-modal-input"
@@ -214,6 +215,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
                   <Input 
                     id="modal-signup-password" 
                     type="password"
+                    placeholder="Create a password"
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     className="auth-modal-input"

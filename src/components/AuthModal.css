@@ -96,18 +96,19 @@
 
 .auth-modal-input-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .auth-modal-input-icon {
   position: absolute;
   left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
   width: 18px;
   height: 18px;
   color: hsl(var(--muted-foreground));
   pointer-events: none;
-  transition: color 0.2s ease;
+  transition: color 0.25s ease;
+  z-index: 1;
 }
 
 .auth-modal-input-wrapper:focus-within .auth-modal-input-icon {
@@ -115,26 +116,36 @@
 }
 
 .auth-modal-input {
-  padding-left: 44px;
+  width: 100%;
+  padding-left: 46px !important;
+  padding-right: 14px;
   height: 48px;
   border-radius: 12px;
   background: hsl(var(--background));
   border: 1.5px solid hsl(var(--border));
   font-size: 0.95rem;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  color: hsl(var(--foreground));
 }
 
 .auth-modal-input:hover {
-  border-color: hsl(var(--primary) / 0.4);
+  border-color: hsl(var(--primary) / 0.5);
+  background: hsl(var(--muted) / 0.3);
 }
 
 .auth-modal-input:focus {
   border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15);
+  background: hsl(var(--background));
+  box-shadow: 
+    0 0 0 3px hsl(var(--primary) / 0.12),
+    0 2px 8px hsl(var(--primary) / 0.08);
+  outline: none;
 }
 
 .auth-modal-input::placeholder {
-  color: hsl(var(--muted-foreground) / 0.7);
+  color: hsl(var(--muted-foreground) / 0.6);
+  font-weight: 400;
+  font-size: 0.9rem;
 }
 
 .auth-modal-submit {
@@ -195,27 +206,4 @@
 
 .auth-modal-tabs [role="tab"][data-state="inactive"]:hover {
   background: hsl(var(--muted) / 0.8);
-}
-
-/* Divider styling */
-.auth-modal-divider {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 16px 0;
-}
-
-.auth-modal-divider::before,
-.auth-modal-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: hsl(var(--border));
-}
-
-.auth-modal-divider span {
-  font-size: 0.8rem;
-  color: hsl(var(--muted-foreground));
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }

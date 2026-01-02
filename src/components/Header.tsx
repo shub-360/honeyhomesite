@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Home, User, LogOut, Shield, Wrench } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Home, User, LogOut, Shield, Wrench, ShoppingCart, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
 import { AuthModal } from "./AuthModal";
 import "./Header.css";
@@ -10,6 +13,8 @@ import "./Header.css";
 export const Header = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, role, signOut, loading } = useAuth();
+  const { cartCount } = useCart();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
@@ -67,25 +72,48 @@ export const Header = () => {
           {loading ? (
             <div className="header-loading" />
           ) : user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="header-user-btn">
-                  {getRoleIcon()}
-                  <span className="header-user-email">{user.email?.split("@")[0]}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="header-dropdown">
-                <div className="header-dropdown-info">
-                  <p className="header-dropdown-email">{user.email}</p>
-                  <span className="header-dropdown-role">{getRoleLabel()}</span>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="header-dropdown-logout">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="relative"
+                onClick={() => navigate("/dashboard")}
+              >
+                <ShoppingCart className="h-4 w-4" />
+                {cartCount > 0 && (
+                  <Badge 
+                    className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-primary text-primary-foreground"
+                  >
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="header-user-btn">
+                    {getRoleIcon()}
+                    <span className="header-user-email">{user.email?.split("@")[0]}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="header-dropdown">
+                  <div className="header-dropdown-info">
+                    <p className="header-dropdown-email">{user.email}</p>
+                    <span className="header-dropdown-role">{getRoleLabel()}</span>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/dashboard")} className="cursor-pointer">
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="header-dropdown-logout">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
             <Button variant="outline" size="sm" onClick={() => setAuthModalOpen(true)}>
               <User className="h-4 w-4 mr-2" />

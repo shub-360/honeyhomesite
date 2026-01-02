@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      cart_items: {
+        Row: {
+          created_at: string
+          id: string
+          quantity: number
+          service_id: string
+          service_name: string
+          service_price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quantity?: number
+          service_id: string
+          service_name: string
+          service_price: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quantity?: number
+          service_id?: string
+          service_name?: string
+          service_price?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -35,6 +65,57 @@ export type Database = {
           id?: string
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      service_orders: {
+        Row: {
+          address: string
+          assigned_technician_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          phone: string
+          scheduled_date: string
+          scheduled_time: string
+          service_id: string
+          service_name: string
+          service_price: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          assigned_technician_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          phone: string
+          scheduled_date: string
+          scheduled_time: string
+          service_id: string
+          service_name: string
+          service_price: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          assigned_technician_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          phone?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          service_id?: string
+          service_name?: string
+          service_price?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

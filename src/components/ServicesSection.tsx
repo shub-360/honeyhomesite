@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookingDialog } from "./BookingDialog";
+import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/contexts/AuthContext";
+import { AuthModal } from "./AuthModal";
 import { 
   Sparkles, 
   Wrench, 
@@ -13,7 +16,8 @@ import {
   ArrowRight,
   Clock,
   IndianRupee,
-  Users
+  Users,
+  ShoppingCart
 } from "lucide-react";
 
 const services = [
@@ -92,10 +96,21 @@ const services = [
 export const ServicesSection = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedServiceCategory, setSelectedServiceCategory] = useState<string | null>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const { addToCart } = useCart();
+  const { user } = useAuth();
 
   const handleBookNow = (serviceId: string) => {
     setSelectedServiceCategory(serviceId);
     setIsBookingOpen(true);
+  };
+
+  const handleAddToCart = (service: { id: string; title: string; price: string }) => {
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+    addToCart(service);
   };
 
   return (
@@ -163,14 +178,24 @@ export const ServicesSection = () => {
                     </ul>
                   </div>
 
-                  <Button 
-                    className="w-full group-hover:shadow-soft transition-all" 
-                    variant="outline"
-                    onClick={() => handleBookNow(service.id)}
-                  >
-                    Book Now
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      className="flex-1 group-hover:shadow-soft transition-all" 
+                      variant="outline"
+                      onClick={() => handleBookNow(service.id)}
+                    >
+                      Book Now
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                    <Button 
+                      variant="secondary"
+                      size="icon"
+                      onClick={() => handleAddToCart({ id: service.id, title: service.title, price: service.price })}
+                      title="Add to Cart"
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -190,6 +215,8 @@ export const ServicesSection = () => {
         onOpenChange={setIsBookingOpen}
         serviceCategory={selectedServiceCategory}
       />
+
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
     </section>
   );
 };

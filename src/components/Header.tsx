@@ -37,7 +37,7 @@ export const Header = () => {
       case "admin":
         return "Admin";
       case "technician":
-        return "Technician";
+        return "Service Provider";
       default:
         return "Customer";
     }
@@ -113,7 +113,7 @@ export const Header = () => {
                     </DropdownMenuItem>
                   )}
                   {role === "technician" && (
-                    <DropdownMenuItem onClick={() => navigate("/technician")} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => navigate("/service-provider")} className="cursor-pointer">
                       <Wrench className="h-4 w-4 mr-2" />
                       My Jobs
                     </DropdownMenuItem>

@@ -106,6 +106,18 @@ export const Header = () => {
                     <LayoutDashboard className="h-4 w-4 mr-2" />
                     Dashboard
                   </DropdownMenuItem>
+                  {role === "admin" && (
+                    <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin Panel
+                    </DropdownMenuItem>
+                  )}
+                  {role === "technician" && (
+                    <DropdownMenuItem onClick={() => navigate("/technician")} className="cursor-pointer">
+                      <Wrench className="h-4 w-4 mr-2" />
+                      My Jobs
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="header-dropdown-logout">
                     <LogOut className="h-4 w-4 mr-2" />

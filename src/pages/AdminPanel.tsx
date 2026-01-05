@@ -29,7 +29,7 @@ interface ServiceOrder {
   created_at: string;
 }
 
-interface Technician {
+interface ServiceProvider {
   user_id: string;
   profile: {
     full_name: string | null;
@@ -41,7 +41,7 @@ const AdminPanel = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<ServiceOrder[]>([]);
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const AdminPanel = () => {
   useEffect(() => {
     if (user && role === "admin") {
       fetchOrders();
-      fetchTechnicians();
+      fetchServiceProviders();
     }
   }, [user, role]);
 
@@ -81,19 +81,19 @@ const AdminPanel = () => {
     setLoadingData(false);
   };
 
-  const fetchTechnicians = async () => {
-    const { data: techRoles, error: rolesError } = await supabase
+  const fetchServiceProviders = async () => {
+    const { data: providerRoles, error: rolesError } = await supabase
       .from("user_roles")
       .select("user_id")
       .eq("role", "technician");
 
     if (rolesError) {
-      console.error("Error fetching technicians:", rolesError);
+      console.error("Error fetching service providers:", rolesError);
       return;
     }
 
-    if (techRoles && techRoles.length > 0) {
-      const userIds = techRoles.map((r) => r.user_id);
+    if (providerRoles && providerRoles.length > 0) {
+      const userIds = providerRoles.map((r) => r.user_id);
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("id, full_name, phone")
@@ -104,11 +104,11 @@ const AdminPanel = () => {
         return;
       }
 
-      const technicianList = techRoles.map((role) => ({
+      const providerList = providerRoles.map((role) => ({
         user_id: role.user_id,
         profile: profiles?.find((p) => p.id === role.user_id) || null,
       }));
-      setTechnicians(technicianList);
+      setServiceProviders(providerList);
     }
   };
 
@@ -126,16 +126,16 @@ const AdminPanel = () => {
     }
   };
 
-  const assignTechnician = async (orderId: string, technicianId: string) => {
+  const assignServiceProvider = async (orderId: string, providerId: string) => {
     const { error } = await supabase
       .from("service_orders")
-      .update({ assigned_technician_id: technicianId, status: "confirmed" })
+      .update({ assigned_technician_id: providerId, status: "confirmed" })
       .eq("id", orderId);
 
     if (error) {
-      toast.error("Failed to assign technician");
+      toast.error("Failed to assign service provider");
     } else {
-      toast.success("Technician assigned");
+      toast.success("Service provider assigned");
       fetchOrders();
     }
   };
@@ -157,10 +157,10 @@ const AdminPanel = () => {
     }
   };
 
-  const getTechnicianName = (techId: string | null) => {
-    if (!techId) return "Unassigned";
-    const tech = technicians.find((t) => t.user_id === techId);
-    return tech?.profile?.full_name || "Unknown Technician";
+  const getServiceProviderName = (providerId: string | null) => {
+    if (!providerId) return "Unassigned";
+    const provider = serviceProviders.find((p) => p.user_id === providerId);
+    return provider?.profile?.full_name || "Unknown Provider";
   };
 
   if (loading) {
@@ -190,7 +190,7 @@ const AdminPanel = () => {
             </Badge>
           </div>
           <p className="text-muted-foreground">
-            Manage all orders, assign technicians, and update statuses.
+            Manage all orders, assign service providers, and update statuses.
           </p>
         </div>
 
@@ -252,7 +252,7 @@ const AdminPanel = () => {
                       <TableHead>Service</TableHead>
                       <TableHead>Schedule</TableHead>
                       <TableHead>Contact</TableHead>
-                      <TableHead>Technician</TableHead>
+                      <TableHead>Service Provider</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -296,20 +296,20 @@ const AdminPanel = () => {
                         <TableCell>
                           <Select
                             value={order.assigned_technician_id || "unassigned"}
-                            onValueChange={(value) => assignTechnician(order.id, value)}
+                            onValueChange={(value) => assignServiceProvider(order.id, value)}
                           >
                             <SelectTrigger className="w-[140px]">
                               <SelectValue>
                                 <span className="flex items-center gap-1">
                                   <Wrench className="h-3 w-3" />
-                                  {getTechnicianName(order.assigned_technician_id)}
+                                  {getServiceProviderName(order.assigned_technician_id)}
                                 </span>
                               </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                              {technicians.map((tech) => (
-                                <SelectItem key={tech.user_id} value={tech.user_id}>
-                                  {tech.profile?.full_name || "Unknown"}
+                              {serviceProviders.map((provider) => (
+                                <SelectItem key={provider.user_id} value={provider.user_id}>
+                                  {provider.profile?.full_name || "Unknown"}
                                 </SelectItem>
                               ))}
                             </SelectContent>

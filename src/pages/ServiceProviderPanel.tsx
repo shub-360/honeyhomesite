@@ -28,7 +28,7 @@ interface ServiceOrder {
   created_at: string;
 }
 
-const TechnicianPanel = () => {
+const ServiceProviderPanel = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<ServiceOrder[]>([]);
@@ -41,7 +41,7 @@ const TechnicianPanel = () => {
         return;
       }
       if (role !== "technician") {
-        toast.error("Access denied. Technicians only.");
+        toast.error("Access denied. Service Providers only.");
         navigate("/dashboard");
         return;
       }
@@ -139,7 +139,7 @@ const TechnicianPanel = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-2">
-            <h1 className="text-3xl font-bold text-foreground">Technician Panel</h1>
+            <h1 className="text-3xl font-bold text-foreground">Service Provider Panel</h1>
             <Badge variant="outline" className="flex items-center gap-1.5 px-3 py-1 bg-blue-500/20 text-blue-600 border-blue-500/30">
               <Wrench className="h-5 w-5" />
               <span>Service Provider</span>
@@ -267,4 +267,4 @@ const TechnicianPanel = () => {
   );
 };
 
-export default TechnicianPanel;
+export default ServiceProviderPanel;

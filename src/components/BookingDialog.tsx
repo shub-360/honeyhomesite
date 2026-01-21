@@ -519,10 +519,18 @@ export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDi
                       id="phone"
                       type="tel"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="Enter your phone number"
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        setFormData({ ...formData, phone: value });
+                      }}
+                      placeholder="Enter 10-digit phone number"
+                      pattern="[0-9]{10}"
+                      maxLength={10}
                       required
                     />
+                    {formData.phone && formData.phone.length !== 10 && (
+                      <p className="text-xs text-destructive">Phone number must be exactly 10 digits</p>
+                    )}
                   </div>
                 </div>
 

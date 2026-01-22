@@ -46,7 +46,10 @@ export const Header = () => {
   return (
     <header className="header">
       <div className="header-container">
-        <div className="header-logo">
+        <div 
+          className="header-logo cursor-pointer transition-transform duration-200 hover:scale-105"
+          onClick={() => navigate("/")}
+        >
           <div className="header-logo-icon">
             <Home />
           </div>

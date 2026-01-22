@@ -203,30 +203,30 @@ export const EditProfileDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] p-0 overflow-hidden">
+        <DialogHeader className="px-6 pt-6 pb-4 bg-gradient-to-r from-primary/10 to-accent/10 border-b border-border">
+          <DialogTitle className="text-xl font-bold text-foreground">Edit Profile</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Update your personal information and profile photo.
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[calc(90vh-120px)] pr-4">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Avatar Upload */}
-            <div className="flex flex-col items-center gap-3">
+        <ScrollArea className="max-h-[calc(90vh-140px)]">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* Avatar Upload Section */}
+            <div className="flex flex-col items-center gap-4 p-6 bg-secondary/50 rounded-xl border border-border">
               <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
-                <Avatar className="h-24 w-24 border-4 border-muted">
-                  <AvatarImage src={avatarUrl} alt="Profile" />
-                  <AvatarFallback className="text-2xl font-semibold bg-primary text-primary-foreground">
+                <Avatar className="h-28 w-28 border-4 border-primary/20 shadow-lg ring-4 ring-primary/10">
+                  <AvatarImage src={avatarUrl} alt="Profile" className="object-cover" />
+                  <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
                     {getInitials()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 flex items-center justify-center bg-foreground/60 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200">
                   {uploading ? (
-                    <Loader2 className="h-6 w-6 text-white animate-spin" />
+                    <Loader2 className="h-7 w-7 text-white animate-spin" />
                   ) : (
-                    <Camera className="h-6 w-6 text-white" />
+                    <Camera className="h-7 w-7 text-white" />
                   )}
                 </div>
                 <input
@@ -238,132 +238,175 @@ export const EditProfileDialog = ({
                   disabled={uploading}
                 />
               </div>
-              {avatarUrl && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleRemoveAvatar}
-                  disabled={removing}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Remove Photo
-                </Button>
-              )}
-              <p className="text-xs text-muted-foreground text-center">
-                Click on the avatar to upload a new photo (max 2MB)
-              </p>
+              
+              <div className="flex flex-col items-center gap-2">
+                {avatarUrl && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveAvatar}
+                    disabled={removing}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1.5" />
+                    Remove Photo
+                  </Button>
+                )}
+                <p className="text-xs text-muted-foreground text-center">
+                  Click avatar to upload • Max 2MB • JPG, PNG
+                </p>
+              </div>
             </div>
 
-            {/* Form Fields */}
+            {/* Personal Information Section */}
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  name="full_name"
-                  placeholder="Enter your full name"
-                  value={formData.full_name}
-                  onChange={handleInputChange}
-                  maxLength={100}
-                />
+              <div className="flex items-center gap-2 pb-2 border-b border-border">
+                <div className="h-2 w-2 rounded-full bg-primary"></div>
+                <h4 className="text-sm font-semibold text-foreground">Personal Information</h4>
               </div>
+              
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="full_name" className="text-sm font-medium text-foreground">
+                    Full Name
+                  </Label>
+                  <Input
+                    id="full_name"
+                    name="full_name"
+                    placeholder="Enter your full name"
+                    value={formData.full_name}
+                    onChange={handleInputChange}
+                    maxLength={100}
+                    className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  placeholder="10-digit phone number"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  maxLength={10}
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-sm font-medium text-foreground">
+                    Phone Number
+                  </Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    placeholder="10-digit phone number"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    maxLength={10}
+                    className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20"
+                  />
+                  {formData.phone && formData.phone.length > 0 && formData.phone.length < 10 && (
+                    <p className="text-xs text-destructive">Phone must be exactly 10 digits</p>
+                  )}
+                </div>
               </div>
+            </div>
 
-              {/* Address Section */}
-              <div className="pt-2">
-                <h4 className="text-sm font-medium text-foreground mb-3">Address Information</h4>
-                <div className="space-y-4">
+            {/* Address Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-border">
+                <div className="h-2 w-2 rounded-full bg-primary"></div>
+                <h4 className="text-sm font-semibold text-foreground">Address Information</h4>
+              </div>
+              
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="address" className="text-sm font-medium text-foreground">
+                    Street Address
+                  </Label>
+                  <Input
+                    id="address"
+                    name="address"
+                    placeholder="Street address, apartment, suite, etc."
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    maxLength={200}
+                    className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="address">Street Address</Label>
+                    <Label htmlFor="city" className="text-sm font-medium text-foreground">
+                      City
+                    </Label>
                     <Input
-                      id="address"
-                      name="address"
-                      placeholder="Street address, apartment, suite, etc."
-                      value={formData.address}
+                      id="city"
+                      name="city"
+                      placeholder="City"
+                      value={formData.city}
                       onChange={handleInputChange}
-                      maxLength={200}
+                      maxLength={100}
+                      className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="city">City</Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        placeholder="City"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        maxLength={100}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="state" className="text-sm font-medium text-foreground">
+                      State
+                    </Label>
+                    <Input
+                      id="state"
+                      name="state"
+                      placeholder="State"
+                      value={formData.state}
+                      onChange={handleInputChange}
+                      maxLength={100}
+                      className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20"
+                    />
+                  </div>
+                </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="state">State</Label>
-                      <Input
-                        id="state"
-                        name="state"
-                        placeholder="State"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        maxLength={100}
-                      />
-                    </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="zip_code" className="text-sm font-medium text-foreground">
+                      Zip Code
+                    </Label>
+                    <Input
+                      id="zip_code"
+                      name="zip_code"
+                      placeholder="Zip/Postal code"
+                      value={formData.zip_code}
+                      onChange={handleInputChange}
+                      maxLength={10}
+                      className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20"
+                    />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="zip_code">Zip Code</Label>
-                      <Input
-                        id="zip_code"
-                        name="zip_code"
-                        placeholder="Zip/Postal code"
-                        value={formData.zip_code}
-                        onChange={handleInputChange}
-                        maxLength={10}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="country">Country</Label>
-                      <Input
-                        id="country"
-                        name="country"
-                        placeholder="Country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                        maxLength={100}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="country" className="text-sm font-medium text-foreground">
+                      Country
+                    </Label>
+                    <Input
+                      id="country"
+                      name="country"
+                      placeholder="Country"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                      maxLength={100}
+                      className="h-11 bg-background border-border focus:border-primary focus:ring-primary/20"
+                    />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3 justify-end pt-4">
+            <div className="flex gap-3 justify-end pt-4 border-t border-border">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
                 disabled={saving}
+                className="px-6 h-11 border-border hover:bg-secondary"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={saving || uploading}>
+              <Button 
+                type="submit" 
+                disabled={saving || uploading}
+                className="px-6 h-11 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md"
+              >
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

@@ -1,23 +1,76 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Home, User, LogOut, Shield, Wrench, ShoppingCart, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/hooks/useCart";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AuthModal } from "./AuthModal";
 import "./Header.css";
 
+interface UserProfile {
+  full_name: string | null;
+  avatar_url: string | null;
+}
+
 export const Header = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const { user, role, signOut, loading } = useAuth();
   const { cartCount } = useCart();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) {
+        setProfile(null);
+        return;
+      }
+      
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url")
+        .eq("id", user.id)
+        .single();
+
+      if (!error && data) {
+        setProfile(data);
+      }
+    };
+
+    fetchProfile();
+
+    // Subscribe to profile changes for real-time updates
+    if (user) {
+      const channel = supabase
+        .channel('profile-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${user.id}`,
+          },
+          (payload) => {
+            setProfile(payload.new as UserProfile);
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user]);
+
   const handleSignOut = async () => {
     await signOut();
+    setProfile(null);
     toast.success("Logged out successfully");
   };
 
@@ -41,6 +94,22 @@ export const Header = () => {
       default:
         return "Customer";
     }
+  };
+
+  const getInitials = () => {
+    if (profile?.full_name) {
+      return profile.full_name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    return user?.email?.slice(0, 2).toUpperCase() || "U";
+  };
+
+  const getDisplayName = () => {
+    return profile?.full_name || user?.email?.split("@")[0] || "User";
   };
 
   return (
@@ -94,15 +163,32 @@ export const Header = () => {
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="header-user-btn">
-                    {getRoleIcon()}
-                    <span className="header-user-email">{user.email?.split("@")[0]}</span>
+                  <Button variant="ghost" size="sm" className="header-user-btn flex items-center gap-2 px-2">
+                    <Avatar className="h-8 w-8 border-2 border-primary/20">
+                      <AvatarImage src={profile?.avatar_url || ""} alt={getDisplayName()} />
+                      <AvatarFallback className="text-xs font-semibold bg-primary text-primary-foreground">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="header-user-email hidden sm:inline">{getDisplayName()}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="header-dropdown">
-                  <div className="header-dropdown-info">
-                    <p className="header-dropdown-email">{user.email}</p>
-                    <span className="header-dropdown-role">{getRoleLabel()}</span>
+                <DropdownMenuContent align="end" className="header-dropdown w-56">
+                  <div className="header-dropdown-info flex items-center gap-3 p-3">
+                    <Avatar className="h-10 w-10 border-2 border-primary/20">
+                      <AvatarImage src={profile?.avatar_url || ""} alt={getDisplayName()} />
+                      <AvatarFallback className="text-sm font-semibold bg-primary text-primary-foreground">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{getDisplayName()}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      <span className="inline-flex items-center gap-1 mt-1 text-xs text-primary">
+                        {getRoleIcon()}
+                        {getRoleLabel()}
+                      </span>
+                    </div>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate("/dashboard")} className="cursor-pointer">

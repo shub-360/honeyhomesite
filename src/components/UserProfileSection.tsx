@@ -14,6 +14,9 @@ interface UserProfile {
   phone: string | null;
   address: string | null;
   city: string | null;
+  state: string | null;
+  country: string | null;
+  zip_code: string | null;
   avatar_url: string | null;
 }
 
@@ -154,16 +157,22 @@ export const UserProfileSection = () => {
             </Button>
           </div>
 
-          {(profile?.phone || profile?.address || profile?.city) && (
+          {(profile?.phone || profile?.address || profile?.city || profile?.state || profile?.country) && (
             <div className="mt-4 pt-4 border-t flex flex-wrap gap-4 text-sm text-muted-foreground">
               {profile?.phone && (
                 <span className="flex items-center gap-1.5">
                   📞 {profile.phone}
                 </span>
               )}
-              {(profile?.address || profile?.city) && (
+              {(profile?.address || profile?.city || profile?.state || profile?.country || profile?.zip_code) && (
                 <span className="flex items-center gap-1.5">
-                  📍 {[profile.address, profile.city].filter(Boolean).join(", ")}
+                  📍 {[
+                    profile.address,
+                    profile.city,
+                    profile.state,
+                    profile.zip_code,
+                    profile.country
+                  ].filter(Boolean).join(", ")}
                 </span>
               )}
             </div>

@@ -4,11 +4,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { UserProfileSection } from "@/components/UserProfileSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingCart, Package, Trash2, Calendar, Clock, MapPin, Phone, Shield, Wrench, User } from "lucide-react";
+import { ShoppingCart, Package, Trash2, Calendar, Clock, MapPin, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -111,28 +112,6 @@ const Dashboard = () => {
     }
   };
 
-  const getRoleIcon = () => {
-    switch (role) {
-      case "admin":
-        return <Shield className="h-5 w-5" />;
-      case "technician":
-        return <Wrench className="h-5 w-5" />;
-      default:
-        return <User className="h-5 w-5" />;
-    }
-  };
-
-  const getRoleBadgeColor = () => {
-    switch (role) {
-      case "admin":
-        return "bg-red-500/20 text-red-600 border-red-500/30";
-      case "technician":
-        return "bg-blue-500/20 text-blue-600 border-blue-500/30";
-      default:
-        return "bg-green-500/20 text-green-600 border-green-500/30";
-    }
-  };
-
   const cartTotal = cartItems.reduce((sum, item) => sum + item.service_price * item.quantity, 0);
 
   if (loading) {
@@ -148,19 +127,8 @@ const Dashboard = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-8 mt-20">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-2">
-            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-            <Badge variant="outline" className={`flex items-center gap-1.5 px-3 py-1 ${getRoleBadgeColor()}`}>
-              {getRoleIcon()}
-              <span className="capitalize">{role || "Customer"}</span>
-            </Badge>
-          </div>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.email?.split("@")[0]}! Manage your cart and orders here.
-          </p>
-        </div>
+        {/* User Profile Section */}
+        <UserProfileSection />
 
         <Tabs defaultValue="cart" className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-2">

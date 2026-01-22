@@ -9,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Calendar, Clock, MapPin, Phone, Wrench, Users, ShoppingCart, BarChart3, IndianRupee, TrendingUp, UserCheck } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Shield, Calendar, Clock, MapPin, Phone, Wrench, Users, ShoppingCart, IndianRupee, TrendingUp, UserCheck, User, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
-import { format, subDays, startOfMonth, endOfMonth } from "date-fns";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend, Tooltip } from "recharts";
+import { format } from "date-fns";
 
 interface ServiceOrder {
   id: string;
@@ -47,8 +47,6 @@ interface UserWithRole {
   } | null;
 }
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
-
 const AdminPanel = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
@@ -56,7 +54,7 @@ const AdminPanel = () => {
   const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>([]);
   const [allUsers, setAllUsers] = useState<UserWithRole[]>([]);
   const [loadingData, setLoadingData] = useState(true);
-  const [activeTab, setActiveTab] = useState("analytics");
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     if (!loading) {
@@ -229,52 +227,35 @@ const AdminPanel = () => {
     }
   };
 
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "admin":
+        return <Shield className="h-4 w-4" />;
+      case "technician":
+        return <Wrench className="h-4 w-4" />;
+      default:
+        return <User className="h-4 w-4" />;
+    }
+  };
+
   const getServiceProviderName = (providerId: string | null) => {
     if (!providerId) return "Unassigned";
     const provider = serviceProviders.find((p) => p.user_id === providerId);
     return provider?.profile?.full_name || "Unknown Provider";
   };
 
-  // Analytics Data Calculations
+  const getInitials = (name: string | null) => {
+    if (!name) return "?";
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  };
+
+  // Stats calculations
   const totalRevenue = orders
     .filter((o) => o.status === "completed")
     .reduce((acc, o) => acc + Number(o.service_price), 0);
 
-  const ordersByStatus = [
-    { name: "Pending", value: orders.filter((o) => o.status === "pending").length },
-    { name: "Confirmed", value: orders.filter((o) => o.status === "confirmed").length },
-    { name: "In Progress", value: orders.filter((o) => o.status === "in_progress").length },
-    { name: "Completed", value: orders.filter((o) => o.status === "completed").length },
-    { name: "Cancelled", value: orders.filter((o) => o.status === "cancelled").length },
-  ].filter((item) => item.value > 0);
-
-  const ordersByService = orders.reduce((acc, order) => {
-    const existing = acc.find((item) => item.name === order.service_name);
-    if (existing) {
-      existing.orders += 1;
-      existing.revenue += Number(order.service_price);
-    } else {
-      acc.push({ name: order.service_name, orders: 1, revenue: Number(order.service_price) });
-    }
-    return acc;
-  }, [] as { name: string; orders: number; revenue: number }[]);
-
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = subDays(new Date(), 6 - i);
-    const dateStr = format(date, "yyyy-MM-dd");
-    const dayOrders = orders.filter((o) => o.created_at.startsWith(dateStr));
-    return {
-      date: format(date, "MMM dd"),
-      orders: dayOrders.length,
-      revenue: dayOrders.reduce((acc, o) => acc + Number(o.service_price), 0),
-    };
-  });
-
-  const usersByRole = [
-    { name: "Customers", value: allUsers.filter((u) => u.role === "user").length },
-    { name: "Service Providers", value: allUsers.filter((u) => u.role === "technician").length },
-    { name: "Admins", value: allUsers.filter((u) => u.role === "admin").length },
-  ];
+  const pendingOrders = orders.filter((o) => o.status === "pending").length;
+  const completedOrders = orders.filter((o) => o.status === "completed").length;
 
   if (loading) {
     return (
@@ -303,32 +284,32 @@ const AdminPanel = () => {
             </Badge>
           </div>
           <p className="text-muted-foreground">
-            Manage users, orders, and view analytics.
+            Manage users and orders
           </p>
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="flex items-center gap-2">
-              <ShoppingCart className="h-4 w-4" />
-              Orders
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <LayoutDashboard className="h-4 w-4" />
+              Overview
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Users
             </TabsTrigger>
+            <TabsTrigger value="orders" className="flex items-center gap-2">
+              <ShoppingCart className="h-4 w-4" />
+              Orders
+            </TabsTrigger>
           </TabsList>
 
-          {/* Analytics Tab */}
-          <TabsContent value="analytics" className="space-y-6">
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
+              <Card className="border-l-4 border-l-primary">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -344,7 +325,7 @@ const AdminPanel = () => {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-l-4 border-l-blue-500">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -357,7 +338,7 @@ const AdminPanel = () => {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-l-4 border-l-green-500">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -370,7 +351,7 @@ const AdminPanel = () => {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-l-4 border-l-purple-500">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -385,117 +366,210 @@ const AdminPanel = () => {
               </Card>
             </div>
 
-            {/* Charts Row 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Orders Trend */}
+            {/* Quick Stats Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Orders Trend (Last 7 Days)</CardTitle>
-                  <CardDescription>Daily order count and revenue</CardDescription>
+                  <CardTitle className="text-lg">Orders Summary</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={last7Days}>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                        <XAxis dataKey="date" className="text-xs" />
-                        <YAxis className="text-xs" />
-                        <Tooltip contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
-                        <Legend />
-                        <Line type="monotone" dataKey="orders" stroke="hsl(var(--primary))" strokeWidth={2} name="Orders" />
-                        <Line type="monotone" dataKey="revenue" stroke="hsl(var(--chart-2))" strokeWidth={2} name="Revenue (₹)" />
-                      </LineChart>
-                    </ResponsiveContainer>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Pending Orders</span>
+                    <Badge variant="outline" className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30">
+                      {pendingOrders}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Confirmed Orders</span>
+                    <Badge variant="outline" className="bg-blue-500/20 text-blue-600 border-blue-500/30">
+                      {orders.filter((o) => o.status === "confirmed").length}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">In Progress</span>
+                    <Badge variant="outline" className="bg-purple-500/20 text-purple-600 border-purple-500/30">
+                      {orders.filter((o) => o.status === "in_progress").length}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-muted-foreground">Completed Orders</span>
+                    <Badge variant="outline" className="bg-green-500/20 text-green-600 border-green-500/30">
+                      {completedOrders}
+                    </Badge>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Orders by Status */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Orders by Status</CardTitle>
-                  <CardDescription>Distribution of order statuses</CardDescription>
+                  <CardTitle className="text-lg">Users Summary</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={ordersByStatus}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {ordersByStatus.map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
-                      </PieChart>
-                    </ResponsiveContainer>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between py-2 border-b border-border">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-green-600" />
+                      <span className="text-muted-foreground">Customers</span>
+                    </div>
+                    <span className="font-semibold">{allUsers.filter((u) => u.role === "user").length}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-border">
+                    <div className="flex items-center gap-2">
+                      <Wrench className="h-4 w-4 text-blue-600" />
+                      <span className="text-muted-foreground">Service Providers</span>
+                    </div>
+                    <span className="font-semibold">{allUsers.filter((u) => u.role === "technician").length}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-red-600" />
+                      <span className="text-muted-foreground">Admins</span>
+                    </div>
+                    <span className="font-semibold">{allUsers.filter((u) => u.role === "admin").length}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Users Tab - Enhanced UI */}
+          <TabsContent value="users" className="space-y-6">
+            {/* User Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <User className="h-7 w-7 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-foreground">
+                        {allUsers.filter((u) => u.role === "user").length}
+                      </div>
+                      <p className="text-sm text-muted-foreground">Customers</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-full bg-blue-500/20 flex items-center justify-center">
+                      <Wrench className="h-7 w-7 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-foreground">
+                        {allUsers.filter((u) => u.role === "technician").length}
+                      </div>
+                      <p className="text-sm text-muted-foreground">Service Providers</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-full bg-red-500/20 flex items-center justify-center">
+                      <Shield className="h-7 w-7 text-red-600" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-foreground">
+                        {allUsers.filter((u) => u.role === "admin").length}
+                      </div>
+                      <p className="text-sm text-muted-foreground">Admins</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Charts Row 2 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Revenue by Service */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Revenue by Service</CardTitle>
-                  <CardDescription>Top performing services</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={ordersByService.slice(0, 5)} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                        <XAxis type="number" className="text-xs" />
-                        <YAxis dataKey="name" type="category" width={100} className="text-xs" />
-                        <Tooltip contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
-                        <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} name="Revenue (₹)" />
-                      </BarChart>
-                    </ResponsiveContainer>
+            {/* Users Grid */}
+            <Card>
+              <CardHeader>
+                <CardTitle>All Users</CardTitle>
+                <CardDescription>Manage user roles and permissions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loadingData ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Users by Role */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Users by Role</CardTitle>
-                  <CardDescription>Distribution of user types</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={usersByRole}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, value }) => `${name}: ${value}`}
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {usersByRole.map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
-                      </PieChart>
-                    </ResponsiveContainer>
+                ) : allUsers.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    No users found
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {allUsers.map((u) => (
+                      <Card key={u.user_id} className="overflow-hidden hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-4">
+                            <Avatar className="h-12 w-12 border-2 border-border">
+                              <AvatarFallback className={`${getRoleColor(u.role)} font-semibold`}>
+                                {getInitials(u.profile?.full_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold text-foreground truncate">
+                                  {u.profile?.full_name || "Unknown User"}
+                                </h3>
+                                {u.user_id === user?.id && (
+                                  <Badge variant="outline" className="text-xs px-1.5 py-0">You</Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="outline" className={`${getRoleColor(u.role)} flex items-center gap-1`}>
+                                  {getRoleIcon(u.role)}
+                                  <span className="capitalize">
+                                    {u.role === "technician" ? "Provider" : u.role}
+                                  </span>
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
+                                <Phone className="h-3 w-3" />
+                                <span>{u.profile?.phone || "No phone"}</span>
+                              </div>
+                              <div className="text-xs text-muted-foreground font-mono mb-3">
+                                ID: {u.user_id.slice(0, 8).toUpperCase()}
+                              </div>
+                              <Select
+                                value={u.role}
+                                onValueChange={(value) => updateUserRole(u.user_id, value as "admin" | "technician" | "user")}
+                                disabled={u.user_id === user?.id}
+                              >
+                                <SelectTrigger className="w-full h-9">
+                                  <SelectValue placeholder="Change Role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="user">
+                                    <div className="flex items-center gap-2">
+                                      <User className="h-4 w-4 text-green-600" />
+                                      Customer
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="technician">
+                                    <div className="flex items-center gap-2">
+                                      <Wrench className="h-4 w-4 text-blue-600" />
+                                      Service Provider
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="admin">
+                                    <div className="flex items-center gap-2">
+                                      <Shield className="h-4 w-4 text-red-600" />
+                                      Admin
+                                    </div>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Orders Tab */}
@@ -648,104 +722,6 @@ const AdminPanel = () => {
                                   <SelectItem value="in_progress">In Progress</SelectItem>
                                   <SelectItem value="completed">Completed</SelectItem>
                                   <SelectItem value="cancelled">Cancelled</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Users Tab */}
-          <TabsContent value="users" className="space-y-6">
-            {/* User Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-foreground">{allUsers.length}</div>
-                  <p className="text-sm text-muted-foreground">Total Users</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {allUsers.filter((u) => u.role === "technician").length}
-                  </div>
-                  <p className="text-sm text-muted-foreground">Service Providers</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold text-green-600">
-                    {allUsers.filter((u) => u.role === "user").length}
-                  </div>
-                  <p className="text-sm text-muted-foreground">Customers</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Users Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle>All Users</CardTitle>
-                <CardDescription>Manage user roles and permissions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {loadingData ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                ) : allUsers.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    No users found
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>User ID</TableHead>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Phone</TableHead>
-                          <TableHead>Current Role</TableHead>
-                          <TableHead>Change Role</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {allUsers.map((u) => (
-                          <TableRow key={u.user_id}>
-                            <TableCell className="font-mono text-xs">
-                              {u.user_id.slice(0, 8).toUpperCase()}
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              {u.profile?.full_name || "Unknown"}
-                            </TableCell>
-                            <TableCell>
-                              {u.profile?.phone || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className={getRoleColor(u.role)}>
-                                {u.role === "technician" ? "Service Provider" : u.role.toUpperCase()}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Select
-                                value={u.role}
-                                onValueChange={(value) => updateUserRole(u.user_id, value as "admin" | "technician" | "user")}
-                                disabled={u.user_id === user?.id}
-                              >
-                                <SelectTrigger className="w-[150px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="user">Customer</SelectItem>
-                                  <SelectItem value="technician">Service Provider</SelectItem>
-                                  <SelectItem value="admin">Admin</SelectItem>
                                 </SelectContent>
                               </Select>
                             </TableCell>

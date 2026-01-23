@@ -19,10 +19,42 @@ interface UserProfile {
 
 export const Header = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMessage, setAuthMessage] = useState<string | undefined>();
+  const [pendingBooking, setPendingBooking] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const { user, role, signOut, loading } = useAuth();
   const { cartCount } = useCart();
   const navigate = useNavigate();
+
+  const handleBookServiceClick = () => {
+    if (!user) {
+      setAuthMessage("Please log in to book a service");
+      setPendingBooking(true);
+      setAuthModalOpen(true);
+    } else {
+      // Scroll to services section when logged in
+      document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    if (pendingBooking) {
+      setPendingBooking(false);
+      setAuthMessage(undefined);
+      // Scroll to services after successful login
+      setTimeout(() => {
+        document.getElementById("services")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  };
+
+  const handleAuthModalChange = (open: boolean) => {
+    setAuthModalOpen(open);
+    if (!open) {
+      setAuthMessage(undefined);
+      setPendingBooking(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -222,13 +254,18 @@ export const Header = () => {
             </Button>
           )}
           
-          <Button variant="default" size="sm">
+          <Button variant="default" size="sm" onClick={handleBookServiceClick}>
             Book Service
           </Button>
         </div>
       </div>
 
-      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
+      <AuthModal 
+        open={authModalOpen} 
+        onOpenChange={handleAuthModalChange}
+        message={authMessage}
+        onSuccess={handleAuthSuccess}
+      />
     </header>
   );
 };

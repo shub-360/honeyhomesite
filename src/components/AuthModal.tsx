@@ -25,9 +25,11 @@ const signupSchema = z.object({
 interface AuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  message?: string;
+  onSuccess?: () => void;
 }
 
-export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
+export const AuthModal = ({ open, onOpenChange, message, onSuccess }: AuthModalProps) => {
   const { signIn, signUp } = useAuth();
   
   const [loginEmail, setLoginEmail] = useState("");
@@ -70,6 +72,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
       toast.success("Welcome back!");
       resetForm();
       onOpenChange(false);
+      onSuccess?.();
     }
   };
 
@@ -102,6 +105,7 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
       toast.success("Account created successfully! Welcome to Honey Homes.");
       resetForm();
       onOpenChange(false);
+      onSuccess?.();
     }
   };
 
@@ -115,6 +119,11 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
             </div>
             <DialogTitle className="auth-modal-title">Honey Homes</DialogTitle>
             <p className="auth-modal-subtitle">Your trusted partner for home services</p>
+            {message && (
+              <div className="mt-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
+                <p className="text-sm text-primary font-medium text-center">{message}</p>
+              </div>
+            )}
           </div>
         </DialogHeader>
 

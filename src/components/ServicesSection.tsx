@@ -97,16 +97,45 @@ export const ServicesSection = () => {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [selectedServiceCategory, setSelectedServiceCategory] = useState<string | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMessage, setAuthMessage] = useState<string | undefined>();
+  const [pendingServiceId, setPendingServiceId] = useState<string | null>(null);
   const { addToCart } = useCart();
   const { user } = useAuth();
 
   const handleBookNow = (serviceId: string) => {
+    if (!user) {
+      setAuthMessage("Please log in to book a service");
+      setPendingServiceId(serviceId);
+      setAuthModalOpen(true);
+      return;
+    }
     setSelectedServiceCategory(serviceId);
     setIsBookingOpen(true);
   };
 
+  const handleAuthSuccess = () => {
+    if (pendingServiceId) {
+      // Open booking dialog after successful login
+      setTimeout(() => {
+        setSelectedServiceCategory(pendingServiceId);
+        setIsBookingOpen(true);
+        setPendingServiceId(null);
+        setAuthMessage(undefined);
+      }, 100);
+    }
+  };
+
+  const handleAuthModalChange = (open: boolean) => {
+    setAuthModalOpen(open);
+    if (!open) {
+      setAuthMessage(undefined);
+      setPendingServiceId(null);
+    }
+  };
+
   const handleAddToCart = (service: { id: string; title: string; price: string }) => {
     if (!user) {
+      setAuthMessage("Please log in to add items to your cart");
       setAuthModalOpen(true);
       return;
     }
@@ -216,7 +245,12 @@ export const ServicesSection = () => {
         serviceCategory={selectedServiceCategory}
       />
 
-      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
+      <AuthModal 
+        open={authModalOpen} 
+        onOpenChange={handleAuthModalChange}
+        message={authMessage}
+        onSuccess={handleAuthSuccess}
+      />
     </section>
   );
 };

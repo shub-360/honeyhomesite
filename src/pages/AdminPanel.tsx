@@ -47,12 +47,19 @@ interface UserWithRole {
   } | null;
 }
 
+interface CustomerProfile {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+}
+
 const AdminPanel = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<ServiceOrder[]>([]);
   const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>([]);
   const [allUsers, setAllUsers] = useState<UserWithRole[]>([]);
+  const [customerProfiles, setCustomerProfiles] = useState<CustomerProfile[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -90,6 +97,15 @@ const AdminPanel = () => {
       toast.error("Failed to fetch orders");
     } else {
       setOrders(data || []);
+      // Fetch customer profiles for these orders
+      if (data && data.length > 0) {
+        const userIds = [...new Set(data.map((o) => o.user_id))];
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name, phone")
+          .in("id", userIds);
+        setCustomerProfiles(profiles || []);
+      }
     }
     setLoadingData(false);
   };
@@ -242,6 +258,11 @@ const AdminPanel = () => {
     if (!providerId) return "Unassigned";
     const provider = serviceProviders.find((p) => p.user_id === providerId);
     return provider?.profile?.full_name || "Unknown Provider";
+  };
+
+  const getCustomerName = (userId: string) => {
+    const customer = customerProfiles.find((c) => c.id === userId);
+    return customer?.full_name || "Unknown Customer";
   };
 
   const getInitials = (name: string | null) => {
@@ -637,6 +658,7 @@ const AdminPanel = () => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Order ID</TableHead>
+                          <TableHead>Customer</TableHead>
                           <TableHead>Service</TableHead>
                           <TableHead>Schedule</TableHead>
                           <TableHead>Contact</TableHead>
@@ -650,6 +672,16 @@ const AdminPanel = () => {
                           <TableRow key={order.id}>
                             <TableCell className="font-mono text-xs">
                               #{order.id.slice(0, 8).toUpperCase()}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                                    {getInitials(getCustomerName(order.user_id))}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="font-medium text-sm">{getCustomerName(order.user_id)}</span>
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div>

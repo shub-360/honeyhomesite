@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,8 +26,12 @@ import {
   Flower2, 
   Car,
   Users,
-  ArrowLeft
+  ArrowLeft,
+  Loader2
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface Service {
   id: string;
@@ -344,7 +348,9 @@ const servicesByCategory: Record<string, Service[]> = {
 };
 
 export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDialogProps) => {
+  const { user } = useAuth();
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const availableServices = serviceCategory ? servicesByCategory[serviceCategory] || [] : [];
   const [formData, setFormData] = useState({
@@ -356,6 +362,31 @@ export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDi
     notes: ""
   });
 
+  // Pre-fill form with user profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, phone, address")
+          .eq("id", user.id)
+          .maybeSingle();
+        
+        if (profile) {
+          setFormData(prev => ({
+            ...prev,
+            name: profile.full_name || "",
+            phone: profile.phone || "",
+            address: profile.address || ""
+          }));
+        }
+      }
+    };
+    if (open) {
+      fetchProfile();
+    }
+  }, [user, open]);
+
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
   };
@@ -364,10 +395,44 @@ export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDi
     setSelectedService(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedService) return;
-    console.log("Booking submitted:", { service: selectedService.id, ...formData });
+    if (!selectedService || !user) return;
+
+    // Validate phone number
+    if (formData.phone.length !== 10) {
+      toast.error("Please enter a valid 10-digit phone number");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Extract numeric price from string (e.g., "₹199" -> 199)
+    const priceMatch = selectedService.price.match(/\d+/);
+    const numericPrice = priceMatch ? parseInt(priceMatch[0], 10) : 0;
+
+    const { error } = await supabase.from("service_orders").insert({
+      user_id: user.id,
+      service_id: selectedService.id,
+      service_name: selectedService.title,
+      service_price: numericPrice,
+      scheduled_date: formData.date,
+      scheduled_time: formData.time,
+      address: formData.address,
+      phone: formData.phone,
+      notes: formData.notes || null,
+      status: "pending"
+    });
+
+    setIsSubmitting(false);
+
+    if (error) {
+      console.error("Error creating booking:", error);
+      toast.error("Failed to create booking. Please try again.");
+      return;
+    }
+
+    toast.success("Booking created successfully! We'll contact you shortly.");
     onOpenChange(false);
     setSelectedService(null);
     setFormData({
@@ -596,11 +661,19 @@ export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDi
                     variant="outline"
                     onClick={() => onOpenChange(false)}
                     className="flex-1"
+                    disabled={isSubmitting}
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" className="flex-1">
-                    Confirm Booking
+                  <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating Booking...
+                      </>
+                    ) : (
+                      "Confirm Booking"
+                    )}
                   </Button>
                 </div>
               </form>

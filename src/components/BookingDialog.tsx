@@ -630,17 +630,28 @@ export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDi
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="time" className="flex items-center space-x-1">
+                    <Label className="flex items-center space-x-1">
                       <Clock className="h-4 w-4" />
                       <span>Preferred Time</span>
                     </Label>
-                    <Input
-                      id="time"
-                      type="time"
-                      value={formData.time}
-                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      required
-                    />
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        "09:00 AM", "10:00 AM", "11:00 AM",
+                        "12:00 PM", "01:00 PM", "02:00 PM",
+                        "03:00 PM", "04:00 PM", "05:00 PM",
+                        "06:00 PM", "07:00 PM", "08:00 PM"
+                      ].map((slot) => (
+                        <Button
+                          key={slot}
+                          type="button"
+                          variant={formData.time === slot ? "default" : "outline"}
+                          className={`text-sm ${formData.time === slot ? "bg-primary text-primary-foreground" : ""}`}
+                          onClick={() => setFormData({ ...formData, time: slot })}
+                        >
+                          {slot}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

@@ -18,7 +18,7 @@ const loginSchema = z.object({
 const signupSchema = z.object({
   fullName: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
   email: z.string().trim().email({ message: "Invalid email address" }),
-  phone: z.string().trim().regex(/^\d{10}$/, { message: "Phone number must be exactly 10 digits" }),
+  phone: z.string().trim().min(10, { message: "Invalid phone number" }).max(15),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 

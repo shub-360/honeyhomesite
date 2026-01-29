@@ -221,6 +221,7 @@ export const ServicesSection = () => {
                       size="icon"
                       onClick={() => handleAddToCart({ id: service.id, title: service.title, price: service.price })}
                       title="Add to Cart"
+                      className="transition-all duration-300 hover:scale-110 hover:bg-primary hover:text-primary-foreground hover:shadow-glow"
                     >
                       <ShoppingCart className="h-4 w-4" />
                     </Button>

@@ -18,7 +18,7 @@ const loginSchema = z.object({
 const signupSchema = z.object({
   fullName: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
   email: z.string().trim().email({ message: "Invalid email address" }),
-  phone: z.string().trim().regex(/^\d{10}$/, { message: "Phone number must be exactly 10 digits" }),
+  phone: z.string().trim().regex(/^\d{10}$/, { message: "Only 10 digits allowed" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
@@ -209,9 +209,13 @@ export const AuthModal = ({ open, onOpenChange, message, onSuccess }: AuthModalP
                   <Input 
                     id="modal-signup-phone" 
                     type="tel" 
-                    placeholder="+91 98765 43210"
+                    placeholder="9876543210"
                     value={signupPhone}
-                    onChange={(e) => setSignupPhone(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setSignupPhone(value);
+                    }}
+                    maxLength={10}
                     className="auth-modal-input"
                     required
                   />

@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { 
   Calendar, 
@@ -630,44 +629,34 @@ export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDi
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Collapsible>
-                      <CollapsibleTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full justify-between"
-                        >
-                          <span className="flex items-center space-x-1">
-                            <Clock className="h-4 w-4" />
-                            <span>Preferred Time</span>
-                          </span>
-                          <span className="text-muted-foreground">
-                            {formData.time || "Select time"}
-                          </span>
-                        </Button>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="pt-2">
-                        <div className="grid grid-cols-3 gap-2">
-                          {[
-                            "09:00 AM", "10:00 AM", "11:00 AM",
-                            "12:00 PM", "01:00 PM", "02:00 PM",
-                            "03:00 PM", "04:00 PM", "05:00 PM",
-                            "06:00 PM", "07:00 PM", "08:00 PM"
-                          ].map((slot) => (
-                            <Button
-                              key={slot}
-                              type="button"
-                              variant={formData.time === slot ? "default" : "outline"}
-                              className={`text-sm ${formData.time === slot ? "bg-primary text-primary-foreground" : ""}`}
-                              onClick={() => setFormData({ ...formData, time: slot })}
-                            >
-                              {slot}
-                            </Button>
-                          ))}
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
+                  <div className="space-y-2 group relative">
+                    <div className="flex items-center space-x-1 cursor-pointer">
+                      <Clock className="h-4 w-4" />
+                      <span>Preferred Time</span>
+                      <span className="ml-2 text-muted-foreground">
+                        {formData.time || "(hover to select)"}
+                      </span>
+                    </div>
+                    <div className="absolute top-full left-0 right-0 z-50 bg-background border rounded-md p-3 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 animate-fade-in">
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          "09:00 AM", "10:00 AM", "11:00 AM",
+                          "12:00 PM", "01:00 PM", "02:00 PM",
+                          "03:00 PM", "04:00 PM", "05:00 PM",
+                          "06:00 PM", "07:00 PM", "08:00 PM"
+                        ].map((slot) => (
+                          <Button
+                            key={slot}
+                            type="button"
+                            variant={formData.time === slot ? "default" : "outline"}
+                            className={`text-sm ${formData.time === slot ? "bg-primary text-primary-foreground" : ""}`}
+                            onClick={() => setFormData({ ...formData, time: slot })}
+                          >
+                            {slot}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 

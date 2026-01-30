@@ -27,7 +27,8 @@ import {
   Car,
   Users,
   ArrowLeft,
-  Loader2
+  Loader2,
+  ShoppingCart
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -675,11 +676,31 @@ export const BookingDialog = ({ open, onOpenChange, serviceCategory }: BookingDi
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => onOpenChange(false)}
+                    onClick={async () => {
+                      if (!selectedService || !user) return;
+                      const priceMatch = selectedService.price.match(/\d+/);
+                      const numericPrice = priceMatch ? parseInt(priceMatch[0], 10) : 0;
+                      
+                      const { error } = await supabase.from("cart_items").insert({
+                        user_id: user.id,
+                        service_id: selectedService.id,
+                        service_name: selectedService.title,
+                        service_price: numericPrice,
+                        quantity: 1
+                      });
+                      
+                      if (error) {
+                        toast.error("Failed to add to cart");
+                        return;
+                      }
+                      toast.success("Added to cart!");
+                      onOpenChange(false);
+                    }}
                     className="flex-1"
                     disabled={isSubmitting}
                   >
-                    Cancel
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Add to Cart
                   </Button>
                   <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting ? (

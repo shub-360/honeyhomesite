@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingCart, Package, Trash2, Calendar, Clock, MapPin, Phone } from "lucide-react";
+import { ShoppingCart, Package, Trash2, Calendar, Clock, MapPin, Phone, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { format } from "date-fns";
 
 interface CartItem {
@@ -254,6 +255,21 @@ const Dashboard = () => {
                         </span>
                         <span className="font-bold text-primary">₹{order.service_price}</span>
                       </div>
+
+                      {order.status === "cancelled" && (
+                        <Alert variant="destructive" className="mt-4 bg-destructive/10 border-destructive/30">
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertTitle className="font-semibold">Refund Notification</AlertTitle>
+                          <AlertDescription className="mt-2 space-y-1 text-sm">
+                            <p><strong>Service:</strong> {order.service_name}</p>
+                            <p><strong>Booking ID:</strong> #{order.id.slice(0, 8).toUpperCase()}</p>
+                            <p><strong>Refund Amount:</strong> ₹{order.service_price}</p>
+                            <p className="pt-1 text-muted-foreground">
+                              This service was not provided and your booking has been cancelled. A full refund of ₹{order.service_price} will be processed to your original payment method within 5–7 business days.
+                            </p>
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
